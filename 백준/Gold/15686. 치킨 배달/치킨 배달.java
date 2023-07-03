@@ -2,75 +2,71 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
-	static int N, M, ans = Integer.MAX_VALUE;
-	static int[][] city;
-	static List<Pos> houseList = new ArrayList<>(); // 모든 집 정보
-	static List<Pos> chickenList = new ArrayList<>(); // 모든 치킨집 정보
-	static Pos[] selectedChicken; // 선택된 치킨집 정보
-	static int houseCnt; // 총 집 수
-	static int chickenCnt; // 총 치킨집 수
-	static int[] dx = { 0, 0, -1, 1 }, dy = { -1, 1, 0, 0 }; // 상하좌우
+    static int N, M, answer = Integer.MAX_VALUE;
+    static List<Point> house, chicken;
+    static Point[] selectChicken;
 
-	static class Pos {
-		int x, y;
+    static class Point {
+        int r, c;
 
-		public Pos(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-	}
+        public Point(int r, int c) {
+            this.r = r;
+            this.c = c;
+        }
+    }
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-		N = Integer.parseInt(st.nextToken()); // 도시 크기
-		M = Integer.parseInt(st.nextToken()); // 치킨집 최대 수
+        N = Integer.parseInt(st.nextToken()); // 도시의 크기
+        M = Integer.parseInt(st.nextToken()); // 폐업시키지 않을 최대 치킨집 수
 
-		city = new int[N][N];
-		for (int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < N; j++) {
-				// 0:빈칸 1:집 2:치킨집
-				city[i][j] = Integer.parseInt(st.nextToken());
+        house = new ArrayList<>();
+        chicken = new ArrayList<>();
+        selectChicken = new Point[M];
 
-				if (city[i][j] == 1) {
-					houseList.add(new Pos(j, i));
-					houseCnt++;
-				} else if (city[i][j] == 2) {
-					chickenList.add(new Pos(j, i));
-					chickenCnt++;
-				}
-			}
-		}
+        for(int r = 0; r < N; r++) {
+            st = new StringTokenizer(br.readLine());
+            for(int c = 0; c < N; c++) {
+                int input = Integer.parseInt(st.nextToken());
+                if(input == 1) house.add(new Point(r, c)); // 집의 좌표
+                else if(input == 2) chicken.add(new Point(r, c)); // 치킨집의 좌표
+            }
+        }
 
-		selectedChicken = new Pos[M];
-		comb(0, 0);
-		System.out.println(ans);
-	}
+        comb(0, 0); // 폐업시키지 않을 치킨집 선책
+        System.out.println(answer);
+    }
 
-	public static void comb(int cnt, int start) {
-		if (cnt == M) {
-			int totalDis = 0;
-			for (int h = 0; h < houseCnt; h++) {
-				int min = Integer.MAX_VALUE;
-				for (int c = 0; c < M; c++) {
-					min = Math.min(min, Math.abs(selectedChicken[c].x - houseList.get(h).x)
-							+ Math.abs(selectedChicken[c].y - houseList.get(h).y));
-				}
-				totalDis += min;
-			}
-			ans = Math.min(ans, totalDis);
-			return;
-		}
+    public static void comb(int cnt, int start) {
+        if(cnt == M) {
+            getChickenDistance(); // 치킨 거리 계산
+            return;
+        }
 
-		for (int i = start; i < chickenCnt; i++) {
-			selectedChicken[cnt] = chickenList.get(i);
-			comb(cnt + 1, i + 1);
-		}
-	}
+        for(int i = start, size = chicken.size(); i < size; i++) {
+            selectChicken[cnt] = chicken.get(i);
+            comb(cnt + 1, i + 1);
+        }
+    }
+
+    public static void getChickenDistance() {
+        int sum = 0;
+
+        for(int i = 0, size = house.size(); i < size; i++) {
+            int distance = Integer.MAX_VALUE; // 해당 집의 치킨 거리
+            for(int j = 0; j < M; j++) {
+                distance = Math.min(distance, Math.abs(house.get(i).r - selectChicken[j].r) + Math.abs(house.get(i).c - selectChicken[j].c));
+            }
+            sum += distance;
+        }
+
+        answer = Math.min(answer, sum);
+    }
 }
