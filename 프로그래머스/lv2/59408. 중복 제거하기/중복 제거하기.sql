@@ -1,4 +1,5 @@
 -- 코드를 입력하세요
 SELECT COUNT(DISTINCT name) AS count
 FROM ANIMAL_INS
-# WHERE NAME IS NOT NULL
+# WHERE NAME IS NOT NULL 
+# DISTINCT는 기본적으로 NULL을 제외시키므로 'IS NOT NULL' 선언 생략
