@@ -1,47 +1,26 @@
 import java.util.*;
 
 class Solution {
+    // **간편한 풀이법을 보고 리팩토링
     public int solution(String message, int[][] spoiler_ranges) {
-        Set<String> importantSet = new HashSet<>();
-        boolean[] isSpoiler = new boolean[message.length()];
+        StringBuilder sb = new StringBuilder(message);
         
-        // 스포일러 여부 배열 초기 세팅
+        // 스포일러 구간 문자를 *로 대체
         for(int[] range: spoiler_ranges) {
-            for(int i = range[0]; i <= range[1]; i++) {
-                isSpoiler[i] = true;
+            for(int r = range[0]; r <= range[1]; r++) {
+                // 하나의 스포 방지 구간에 여러 단어가 포함될 수 있으니 공백 패스
+                if(sb.charAt(r) == ' ') continue;
+                sb.setCharAt(r, '*');
             }
         }
         
-        String[] words = message.split(" ");
-        Set<String> spoSet = new HashSet<>();     // 스포 방지 단어
-        Set<String> notSpoSet = new HashSet<>();  // 스포 방지 단어가 아닌 단어
+        Set<String> set = new HashSet<>(Arrays.asList(sb.toString().split(" ")));
+        Set<String> importantSet = new HashSet<>();
         
-        int index = 0;
-        
-        for(String word: words) {
-            int wordLen = word.length();
-            boolean isSpo = false;
-            
-            for(int i = index; i < index + wordLen; i++) {
-                // 스포 방지 구간인지 확인
-                if(isSpoiler[i]) {
-                    isSpo = true;
-                    break;
-                }
-            }
-            if(isSpo) spoSet.add(word);
-            else notSpoSet.add(word);
-            
-            index += wordLen + 1;
-        }
-    
-        // 1. 스포 방지 단어여야 한다
-        for(String word: spoSet) {
-            // 2. 스포 방지 구간이 아닌 구간에 등정한 적이 없어야 한다
-            if(!notSpoSet.contains(word)) {
-                // 3. 이전에 공개된 스포 방지 단어와 중복되면 안된다
-                importantSet.add(word);
-            }
+        for(String word: message.split(" ")) {
+            if(set.contains(word)) continue;
+            // 스포 방지 단어인 경우
+            importantSet.add(word);
         }
         
         return importantSet.size();
