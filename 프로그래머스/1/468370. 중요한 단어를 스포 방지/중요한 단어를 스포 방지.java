@@ -2,6 +2,7 @@ import java.util.*;
 
 class Solution {
     // **간편한 풀이법을 보고 리팩토링
+    // But, 기존 풀이법 메모리와 시간 성능이 더 좋음..
     public int solution(String message, int[][] spoiler_ranges) {
         StringBuilder sb = new StringBuilder(message);
         
